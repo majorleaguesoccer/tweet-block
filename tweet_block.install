@@ -1,0 +1,125 @@
+<?php
+/**
+ * @file
+ * Tweet block install
+ */
+/**
+ * Implementation of hook_schema().
+ *
+ * TODO: Describe the module's data model
+ *
+ */
+function tweet_block_schema() {
+  $schema = array();
+
+  $schema['tweet_block'] = array(
+    'description' => t('Table to store static tweet blocks fetched by the oEmbed API'),
+    'fields' => array(
+      'tweet_block_uid' => array(
+        'description' => t('Unique id for the tweet block'),
+        'type' => 'int',
+        'not null' => TRUE,
+      ),
+      'tweet_id' => array(
+        'description' => t('Id of the tweet'),
+        'type' => 'int',
+        'not null' => FALSE,
+      ),
+      'tweet_markup' => array(
+        'description' => t('Html markup returned by the API'),
+        'type' => 'varchar',
+        'length' => '1000',
+        'not null' => FALSE,
+        'default' => '',
+      ),
+      'tweet_author_name' => array(
+        'description' => t('author name  returned by the API'),
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => FALSE,
+        'default' => '',
+      ),
+      'tweet_author_url' => array(
+        'description' => t('author url returned by the API'),
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => FALSE,
+        'default' => '',
+      ),
+    ),
+    'primary key' => array('tweet_block_uid'),
+  );
+  
+  //used for specific feed style blocks
+  $schema['tweet_feed_block'] = array(
+    'description' => t('Table to house twitter feed blocks.'),
+    'fields' => array(
+      'tweet_feed_block_id' => array(
+        'description' => t('Id column used as primary key for feed blocks.'),
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'tweet_feed_title' => array(
+        'description' => t('Actual block title to display.'),
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => TRUE,
+        'default' => 'Twitter',
+      ),
+      'tweet_feed_twitter_id' => array(
+        'description' => t('Actual twitter id aka twitter username.'),
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'tweet_feed_read_more_url' => array(
+        'description' => t('URL used for the read more link for the tweet feed block.'),
+        'type' => 'varchar',
+        'length' => '1000',
+        'not null' => FALSE,
+        'default' => '',
+      ),
+    ),
+    'primary key' => array('tweet_feed_block_id'),
+  );
+
+  return $schema;
+}
+
+/**
+ * Implementation of hook_install().
+ *
+ * Perform initial setup tasks
+ *
+ */
+function tweet_block_install() {
+  // Perform install stuffz
+  drupal_install_schema('tweet_block');
+}
+
+/**
+ * Implementation of hook_uninstall().
+ *
+ * Perform final cleanup tasks
+ *
+ */
+function tweet_block_uninstall() {
+  // perform uninstall stuffz
+  drupal_uninstall_schema('tweet_block');
+}
+
+/** 
+ * Update to change db type on tweetid. Tweet ids are freaking long and going to get longer, int can't handle it.
+ * @author Hans 'Table Alterer' Gutknecht
+ */
+function tweet_block_update_8010() {
+ $ret = array();
+
+ db_change_field($ret, 'tweet_block', 'tweet_id', 'tweet_id',
+   array('type' => 'varchar', 'length' => '40')
+   );
+
+ return $ret;
+}

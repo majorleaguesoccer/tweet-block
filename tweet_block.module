@@ -1,0 +1,288 @@
+<?php
+/**
+ * @file
+ * Main module file for Tweet Block module.
+ * author: Hans Gutknecht. hans.gutknecht@mlssoccer.com / hansdotcom@gmail.com
+ */
+
+/**
+ * Implements hook_perm().
+ *
+ */
+function tweet_block_permission() {
+  return array(
+    'administer tweet blocks' => array(
+      'title' => t('administer tweet blocks')
+    )
+  );
+}
+
+/**
+ * Implements hook_menu().
+ *
+ */
+function tweet_block_menu() {
+  $items = array();
+
+  $items['admin/settings/tweetblock'] = array(
+    'title' => 'Tweet Block settings',
+    'description' => 'Configuration options for the tweet block module',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('tweet_block_settings_form'),
+    'file' => 'tweet_block.admin.inc',
+    'access callback' => 'user_access',
+    'access arguments' => array('administer tweet blocks'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+  $items['admin/settings/tweetblock/edit/%'] = array(
+    'title' => 'Tweet Feed Edit Block',
+    'description' => 'Re-configure existing feed blocks.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('tweet_block_edit_form', 4),
+    'file' => 'tweet_block.admin.inc',
+    'access arguments' => array('administer tweet blocks'),
+    'type' => MENU_CALLBACK,
+  );
+  $items['admin/settings/tweetblock/remove/%'] = array(
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('tweet_block_remove_feed', 4),
+    'access arguments' => array('administer tweet blocks'),
+    'type' => MENU_CALLBACK,
+  );
+  return $items;
+}
+
+/**
+ * Implements hook_theme().
+ *
+ */
+function tweet_block_theme() {
+  $path = drupal_get_path('module', 'tweet_block');
+
+  return array('tweet_block_single' => array(
+        'path' => $path . '/theme',
+        'template' => 'tweet_block_single',
+        'arguments' => array('tweet_content' => '')
+      ),
+      'tweet_block_right' => array(
+        'path' => $path . '/theme',
+        'template' => 'tweet_block_right',
+        'arguments' => array('tweet_content' => '')
+      ),
+      'tweet_block_center' => array(
+        'path' => $path . '/theme',
+        'template' => 'tweet_block_center',
+        'arguments' => array('tweet_content' => '')
+      ),
+      'tweet_block_right_feed' => array(
+        'path' => $path . '/theme',
+        'template' => 'tweet_block_right-feed',
+        'arguments' => array('content' => '')
+      ),
+  );
+}
+
+/**
+ * tweet_block_get_tweet ($tweet_id)
+ * ping the oEmbed twitter API and grab the html from the JSON response
+ */
+function tweet_block_get_tweet($tweet_id) {
+  // hit the Twitter API
+  $tweet_get_url = "https://api.twitter.com/1/statuses/oembed.json?id=" . $tweet_id . "&omit_script=true";
+  $tweet_response = drupal_http_request($tweet_get_url, $headers = array(), $method = 'GET', $data = NULL, $retry = 3);
+  // Decode it and grab the 3 things I want
+  $tweet_json_decoded = json_decode($tweet_response->data, TRUE);
+  $tweet_markup = $tweet_json_decoded['html'];
+  $tweet_author = $tweet_json_decoded['author_name'];
+  $tweet_author_url = $tweet_json_decoded['author_url'];
+  // Wrap that into a nice returnable array
+  $tweet_content = array($tweet_markup, $tweet_author, $tweet_author_url);
+  return $tweet_content;
+}
+
+/**
+ * Get the info from the db to set and theme the tweet block
+ */
+function tweet_block_get_tweet_info($block_uid) {
+  $result = db_query("SELECT tweet_id, tweet_markup, tweet_author_name, tweet_author_url FROM {tweet_block} WHERE tweet_block_uid = :block_uid", array(':block_uid' => $block_uid));
+  return db_fetch_array($result);
+}
+
+/**
+ * Set the info in the db
+ */
+function tweet_block_set_tweet_info($block_uid, $tweet_id, $tweet_content) {
+  $result = db_update('tweet_block')
+    ->fields(array(
+      'tweet_id' => $tweet_id,
+      'tweet_markup' => $tweet_content[0],
+      'tweet_author_name' => $tweet_content[1],
+      'tweet_author_url' => $tweet_content[2],
+      ))
+    ->condition('tweet_block_uid', $block_uid)
+    ->execute();
+  // If no rows were updated, a row doesn't exist yet for this tweet block, let's insert it!
+  if (count($result) == 0) {
+    db_insert('tweet_block')
+    ->fields(array(
+      'tweet_block_uid' => $block_uid,
+      'tweet_id' => $tweet_id,
+      'tweet_markup' => $tweet_content[0],
+      'tweet_author_name' => $tweet_content[1],
+      'tweet_author_url' => $tweet_content[2],
+    ))
+    ->execute();
+  }
+}
+
+/**
+ * Delete the tweet block info in the db
+ */
+function tweet_block_delete_tweet_info($block_uid) {
+  db_delete('tweet_block')
+  ->condition('tweet_block_uid', $block_uid)
+  ->execute();
+}
+
+/**
+ * Implementation of hook_block().
+ * Generate the blocks and output
+ */
+function tweet_block_block($op = 'list', $delta = 0, $edit = array()) {
+  // Base needed for functionality
+  drupal_add_css(drupal_get_path('module', 'tweet_block') . '/theme/base.css');
+  // Theme feel free to make your own and override
+  drupal_add_css(drupal_get_path('module', 'tweet_block') . '/theme/theme.css');
+  $blocks = array();
+  $feed_blocks = tweet_block_get_feeds();
+  switch ($op) {
+    case 'list':
+      $blocks['tweet_block_1']['info'] = t('Tweet Block 1 - Single line');
+      $blocks['tweet_block_2']['info'] = t('Tweet Block 2 - Right Rail (300px)');
+      $blocks['tweet_block_3']['info'] = t('Tweet Block 3 - Center Content (620px)');
+      if($feed_blocks) {
+        foreach($feed_blocks as $key => $feed_block) {
+          $blocks['tweet_feed_block_' . $key]['info'] = t('Tweet Feed Block - Right Rail (300px) - @' . $feed_block['tweet_feed_twitter_id']);
+        }
+      }
+    return $blocks;
+    case 'view':
+    switch($delta) {
+      case 'tweet_block_1':
+        $block['subject'] = t('<none>');
+        $block['content'] = tweet_block_content_1();
+        break;
+      case 'tweet_block_2':
+        $block['subject'] = t('<none>');
+        $block['content'] = tweet_block_content_2();
+        break;
+      case 'tweet_block_3':
+        $block['subject'] = t('<none>');
+        $block['content'] = tweet_block_content_3();
+        break;
+    }
+    if($feed_blocks) {
+      //loop through all the feed block types
+      foreach($feed_blocks as $key => $feed_block) {
+        switch($delta) {
+          case 'tweet_feed_block_' . $key:
+            $block['subject'] = t($feed_block['tweet_feed_title']);
+            $block['content'] = tweet_block_feed_content($feed_block['tweet_feed_twitter_id'], $feed_block['tweet_feed_read_more_url']);
+            break;
+        }
+      }
+    }
+    return $block;
+  }
+}
+/**
+ * Function to generate the content for block 1 - single
+ */
+function tweet_block_content_1() {
+  $tweet_content = tweet_block_get_tweet_info(1);
+  $output = theme('tweet_block_single', $tweet_content);
+  return $output;
+}
+
+/**
+ * Function to generate the content for block 2 - rr
+ */
+function tweet_block_content_2() {
+  $tweet_content = tweet_block_get_tweet_info(2);
+  $output = theme('tweet_block_right', $tweet_content);
+  return $output;
+}
+
+/**
+ * Function to generate the content for block 3 - center
+ */
+function tweet_block_content_3() {
+  $tweet_content = tweet_block_get_tweet_info(3);
+  $tweet_id = variable_get('tweet_id_3');
+  $output = theme('tweet_block_center', $tweet_content);
+  return $output;
+}
+
+/**
+ * Set the info in the db
+ */
+function tweet_block_set_feed_info($title, $twitter_id, $read_more) {
+  $result = db_query("SELECT tweet_feed_twitter_id FROM {tweet_feed_block} WHERE tweet_feed_twitter_id = '" . $twitter_id . "' ");
+  if(!db_fetch_array($result)) {
+    db_query("INSERT INTO {tweet_feed_block} (tweet_feed_title, tweet_feed_twitter_id, tweet_feed_read_more_url) VALUES ('%s', '%s', '%s')", $title, $twitter_id, $read_more);
+    drupal_set_message(t('New feed block saved.'));
+  } else {
+    drupal_set_message(t('Block with that twitter id already exists.'));
+  }
+}
+
+/**
+ * Get the info from the db
+ */
+function tweet_block_get_feeds() {
+  $return = '';
+  $result = db_query("SELECT * FROM {tweet_feed_block}");
+  while($r = db_fetch_array($result)) {
+    $return[] = $r;
+  }
+  return $return;
+}
+
+/**
+ * Get the info from the db
+ */
+function tweet_block_get_feed($id) {
+  $result = db_query("SELECT * FROM {tweet_feed_block} WHERE tweet_feed_block_id='%d'", $id);
+  return  db_fetch_array($result);
+}
+
+/**
+ * Delete the tweet block info in the db
+ */
+function tweet_block_remove_feed() {
+  $id = arg(4);
+  $result = db_query("DELETE FROM {tweet_feed_block} WHERE tweet_feed_block_id = %d", $id);
+  drupal_goto('admin/settings/tweetblock');
+  drupal_set_message(t('Block removed.'));
+}
+
+/**
+ * Submission function for tweet_block_settings_form.
+ */
+function tweet_block_edit_form_submit(&$form, &$form_state) {
+  db_query("UPDATE {tweet_feed_block} SET tweet_feed_title = '%s', tweet_feed_twitter_id = '%s', tweet_feed_read_more_url = '%s' WHERE tweet_feed_block_id = '%d'", $form_state['clicked_button']['#post']['tweet_block_4_title'], $form_state['clicked_button']['#post']['tweet_block_id'], $form_state['clicked_button']['#post']['tweet_block_rm'], arg(4));
+  drupal_goto('admin/settings/tweetblock');
+  drupal_set_message(t('Feed block saved.'));
+}
+
+/**
+ * Function to generate the content for block - rr feed
+ */
+function tweet_block_feed_content($twitter_id, $read_more) {
+  $content = array(
+    'username' => $twitter_id,
+    'read_more' => $read_more,
+  );
+  $output = theme('tweet_block_right_feed', $content);
+  return $output;
+}

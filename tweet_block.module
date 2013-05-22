@@ -165,15 +165,15 @@ function tweet_block_settings_form() {
    '#value' => t('Save settings'),
   );
   
-  $form['mls_feed_blocks'] = array(
+  $form['tweet_block_feed_blocks'] = array(
     '#type' => 'fieldset',
     '#title' => t('Feed Blocks List'),
   );
 
   $feed_blocks = tweet_block_get_feeds();
-  if($feed_blocks) {
-    foreach($feed_blocks as $key => $feed_block) {
-      $form['mls_feed_blocks']['feed_block_' . $key] = array(
+  if ($feed_blocks) {
+    foreach ($feed_blocks as $key => $feed_block) {
+      $form['tweet_block_feed_blocks']['feed_block_' . $key] = array(
         '#prefix' => '<div>',
         '#value' => '<a href="tweetblock/edit/' . $feed_block['tweet_feed_block_id'] . '">' . t($feed_block['tweet_feed_title'] . ' - ' . $feed_block['tweet_feed_twitter_id']) . '</a> / <a href="tweetblock/remove/' . $feed_block['tweet_feed_block_id'] . '">Remove</a>',
         '#suffix' => '</div>',
@@ -279,7 +279,7 @@ function tweet_block_settings_form_submit(&$form, &$form_state) {
   }
   drupal_set_message(t('Your tweet block settings have been saved. ' . $blocks_built . ' blocks have been generated and are available through the block system.'));
   
-  if($form_state['values']['tweet_block_4_id']) {
+  if ($form_state['values']['tweet_block_4_id']) {
     tweet_block_set_feed_info($form_state['values']['tweet_block_4_title'], $form_state['values']['tweet_block_4_id'], $form_state['values']['tweet_block_4_rm']);
   }
 }
@@ -344,14 +344,14 @@ function tweet_block_block($op = 'list', $delta = 0, $edit = array()) {
       $blocks['tweet_block_1']['info'] = t('Tweet Block 1 - Single line');
       $blocks['tweet_block_2']['info'] = t('Tweet Block 2 - Right Rail (300px)');
       $blocks['tweet_block_3']['info'] = t('Tweet Block 3 - Center Content (620px)');
-      if($feed_blocks) {
-        foreach($feed_blocks as $key => $feed_block) {
+      if ($feed_blocks) {
+        foreach ($feed_blocks as $key => $feed_block) {
           $blocks['tweet_feed_block_' . $key]['info'] = t('Tweet Feed Block - Right Rail (300px) - @' . $feed_block['tweet_feed_twitter_id']);
         }
       }
     return $blocks;
     case 'view':
-    switch($delta) {
+    switch ($delta) {
       case 'tweet_block_1':
         $block['subject'] = t('<none>');
         $block['content'] = tweet_block_content_1();
@@ -365,10 +365,10 @@ function tweet_block_block($op = 'list', $delta = 0, $edit = array()) {
         $block['content'] = tweet_block_content_3();
         break;
     }
-    if($feed_blocks) {
+    if ($feed_blocks) {
       //loop through all the feed block types
-      foreach($feed_blocks as $key => $feed_block) {
-        switch($delta) {
+      foreach ($feed_blocks as $key => $feed_block) {
+        switch ($delta) {
           case 'tweet_feed_block_' . $key:
             $block['subject'] = t($feed_block['tweet_feed_title']);
             $block['content'] = tweet_block_feed_content($feed_block['tweet_feed_twitter_id'], $feed_block['tweet_feed_read_more_url']);
@@ -412,10 +412,11 @@ function tweet_block_content_3() {
  */
 function tweet_block_set_feed_info($title, $twitter_id, $read_more) {
   $result = db_query("SELECT tweet_feed_twitter_id FROM {tweet_feed_block} WHERE tweet_feed_twitter_id = '" . $twitter_id . "' ");
-  if(!db_fetch_array($result)) {
+  if (!db_fetch_array($result)) {
     db_query("INSERT INTO {tweet_feed_block} (tweet_feed_title, tweet_feed_twitter_id, tweet_feed_read_more_url) VALUES ('%s', '%s', '%s')", $title, $twitter_id, $read_more);
     drupal_set_message(t('New feed block saved.'));
-  } else {
+  }
+  else {
     drupal_set_message(t('Block with that twitter id already exists.'));
   }
 }
@@ -426,7 +427,7 @@ function tweet_block_set_feed_info($title, $twitter_id, $read_more) {
 function tweet_block_get_feeds() {
   $return = '';
   $result = db_query("SELECT * FROM {tweet_feed_block}");
-  while($r = db_fetch_array($result)) {
+  while ($r = db_fetch_array($result)) {
     $return[] = $r;
   }
   return $return;

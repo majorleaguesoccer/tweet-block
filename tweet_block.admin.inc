@@ -17,7 +17,7 @@ function tweet_block_settings_form() {
 
   $form['tweet_block_1'] = array(
     '#type' => 'fieldset',
-    '#title' => t('Tweet Block 1 - Single line display (Custom)'),
+    '#title' => t('Tweet Block #1 - Custom thin'),
     '#description' => t('A single line display block of the specified tweet.'),
   );
 
@@ -31,7 +31,7 @@ function tweet_block_settings_form() {
 
   $form['tweet_block_2'] = array(
     '#type' => 'fieldset',
-    '#title' => t('Tweet Block 2 - RIGHT RAIL (Twitter Embed formatting)'),
+    '#title' => t('Tweet Block #2 - Twitter Embed formatting'),
     '#description' => t('A twitter formatter display block of the specified tweet for the RIGHT RAIL (300px)'),
   );
 
@@ -45,7 +45,7 @@ function tweet_block_settings_form() {
 
   $form['tweet_block_3'] = array(
     '#type' => 'fieldset',
-    '#title' => t('Tweet Block 3 - CENTER REGION (Custom)'),
+    '#title' => t('Tweet Block #3 - Custom tall'),
     '#description' => t('A twitter formatter display block of the specified tweet for the CENTER REGION (620px)'),
   );
 
@@ -59,7 +59,7 @@ function tweet_block_settings_form() {
   
   $form['tweet_block_4'] = array(
     '#type' => 'fieldset',
-    '#title' => t('Tweet Block 4 - RIGHT RAIL (Custom Feed)'),
+    '#title' => t('Tweet Block - Embedded Timeline'),
     '#description' => t('A twitter formatter display block of the specified feed for the RIGHT RAIL (300px)'),
   );
   

@@ -52,7 +52,10 @@ function tweet_block_menu() {
 }
 
 function tweet_block_init() {
-  drupal_add_js('//platform.twitter.com/widgets.js', 'external');
+  $include_script = variable_get('tweet_block_script', TRUE);
+  if ($include_script) {
+    drupal_add_js('//platform.twitter.com/widgets.js', 'external');
+  }
 }
 
 /**
@@ -203,7 +206,6 @@ function tweet_block_content_2() {
  */
 function tweet_block_content_3() {
   $tweet_content = tweet_block_get_tweet_info(3);
-  //$tweet_id = variable_get('tweet_id_3');
   $output = theme('tweet_block_center', $tweet_content);
   return $output;
 }

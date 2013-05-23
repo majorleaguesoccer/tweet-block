@@ -88,28 +88,6 @@ function tweet_block_schema() {
   return $schema;
 }
 
-/**
- * Implementation of hook_install().
- *
- * Perform initial setup tasks
- *
- */
-function tweet_block_install() {
-  // Perform install stuffz
-  drupal_install_schema('tweet_block');
-}
-
-/**
- * Implementation of hook_uninstall().
- *
- * Perform final cleanup tasks
- *
- */
-function tweet_block_uninstall() {
-  // perform uninstall stuffz
-  drupal_uninstall_schema('tweet_block');
-}
-
 /** 
  * Update to change db type on tweetid. Tweet ids are freaking long and going to get longer, int can't handle it.
  * @author Hans 'Table Alterer' Gutknecht

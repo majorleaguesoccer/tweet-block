@@ -1,7 +1,6 @@
 <?php if (!empty($tweet_content['tweet_markup'])): ?>
   <div class="tweet-block center clearfix">
     <div class="tweet">
-      <span class="bqstart">&#8220;</span>
     <?php
       // Strip the tweet
       $pattern = "/<p>(.*?)<\/p>/";
@@ -9,7 +8,9 @@
       print '<p>' . $tweet[1] . '</p>';
     ?>
     </div>
-    <div class="author">~ <?php print $tweet_content['tweet_author_name'] ?></div><a href="<?php print $tweet_content['tweet_author_url'] ?>" class="twitter-follow-button" data-show-count="false">Follow <?php print $tweet_content['tweet_author_name'] ?></a>
+    <div class="author">
+      ~ <?php print $tweet_content['tweet_author_name'] ?>
+      <a href="<?php print $tweet_content['tweet_author_url'] ?>" class="twitter-follow-button" data-show-count="false">Follow <?php print $tweet_content['tweet_author_name'] ?></a></div>
     <div class="intents">
       <ul>
         <li><a href="https://twitter.com/intent/tweet?in_reply_to=<?php print $tweet_content['tweet_id']; ?>" class="reply-action twt-intent" title="Reply"><i></i><b>Reply</b></a></li>

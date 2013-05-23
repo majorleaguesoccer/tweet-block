@@ -1,5 +1,5 @@
 <?php if (!empty($tweet_content['tweet_markup'])): ?>
-  <div class="tweet-block single">
+  <div class="tweet-block custom_thin">
     <div class="tweet">
     <?php
       // Strip the tweet

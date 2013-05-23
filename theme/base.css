@@ -1,13 +1,14 @@
-/* Single - custom 1 */
-.tweet-block.single {
+/* Custom block styling - please custom to your needs! */
+/* Custom block  */
+.tweet-block.custom_thin {
   display: block;
   width: 740px;
   font-size: 10px;
 }
-.tweet-block.single .tweet {
+.tweet-block.custom_thin .tweet {
   float: left;
 }
-.tweet-block.single .tweet p {
+.tweet-block.custom_thin .tweet p {
   background: hsl(0, 0%, 98%);
   padding: 6px 9px;
   border-radius: 6px;
@@ -16,7 +17,7 @@
   margin: 0;
   line-height: 100%;
 }
-.tweet-block.single .intents {
+.tweet-block.custom_thin .intents {
   background: url('images/bird_sm.png') no-repeat scroll 5px 2px;
   float: left;
   padding: 2px 0 0 13px;
@@ -25,6 +26,7 @@
 #block-tweet_block-tweet_block_3 {
   float: left; /* so that it does not sit on top of other blocks */
   border-top: 1px solid #0b0b0b;
+  width: 100%;
 }
 .tweet-block.center {
   background: #252525;
@@ -36,25 +38,25 @@
   border-width: 1px 0;
 }
 .tweet-block.center .tweet {
-  background: url('images/bird.png') no-repeat scroll 485px -1px;
+  background: url('images/bird.png') no-repeat scroll 95% 0;
   color: #000;
   font-size: 16px;
   line-height: 24px;
-  padding: 0 133px 0 0px;
-  height: 78px;
+  padding: 0 133px 25px 0;
 }
 .tweet-block.center .tweet p {
   background: #F2F2F2;
-  padding: 9px 10px 12px 41px;
+  padding: 9px 10px 12px 10px;
   border-radius: 8px;
   box-shadow: inset 0 0 2px #999;
   text-shadow: 0 1px 0 white;
   line-height: 20px;
 }
 .tweet-block.center .author {
+  bottom: 10px;
   color: #F9F9F9;
-  float: left;
   padding: 10px 13px 0 0;
+  position: absolute;
   text-shadow: 0 1px 0 #000;
 }
 .tweet-block.center .twitter-follow-button {
@@ -76,59 +78,67 @@
 .tweet-block.center .intents {
   bottom: 15px;
   position: absolute;
-  right: 30px;
+  right: 15px;
 }
 .tweet-block.center .intents ul li,
-.tweet-block.single .intents ul li {
+.tweet-block.custom_thin .intents ul li {
   background: url('images/sprite-white.png') no-repeat scroll 0 0;
   float: left;
   list-style: none;
   padding: 0 3px 0 0;
 }
 .tweet-block.center .intents ul li:hover,
-.tweet-block.single .intents ul li:hover {
+.tweet-block.custom_thin .intents ul li:hover {
   background-position:  -25px 0;
 }
 .tweet-block.center .intents ul li.rt,
-.tweet-block.single .intents ul li.rt {
+.tweet-block.custom_thin .intents ul li.rt {
   background-position: 0 -39px;
 }
 .tweet-block.center .intents ul li.rt:hover,
-.tweet-block.single .intents ul li.rt:hover {
+.tweet-block.custom_thin .intents ul li.rt:hover {
   background-position: -26px -39px;
 }
 .tweet-block.center .intents ul li.fav,
-.tweet-block.single .intents ul li.fav {
+.tweet-block.custom_thin .intents ul li.fav {
   background-position: 0 -20px;
 }
 .tweet-block.center .intents ul li.fav:hover,
-.tweet-block.single .intents ul li.fav:hover {
+.tweet-block.custom_thin .intents ul li.fav:hover {
   background-position:  -25px -20px;
 }
 .tweet-block.center .intents ul li a,
-.tweet-block.single .intents ul li a {
+.tweet-block.custom_thin .intents ul li a {
   display: block;
   height: 16px;
   width: 22px;
   text-indent: -1000em;
   overflow: hidden;
 }
-/* Feed */
-.block-tweet_block .twtr-ft {
-  display: none;
+
+.tweet-block.custom_thin .intents ul li {
+  background: url('images/sprite.png');
+  background-position: 110px 0;
 }
-.block-tweet_block .twitter-footer {
+.tweet-block.custom_thin .intents ul li:hover {
+  background-position:  126px 0;
+}
+.tweet-block.custom_thin .intents ul li.rt {
+  background-position: 31px 0;
+}
+.tweet-block.custom_thin .intents ul li.rt:hover {
+  background-position: 47px 0;
+}
+.tweet-block.custom_thin .intents ul li.fav {
+  background-position:  78px 0;
+}
+.tweet-block.custom_thin .intents ul li.fav:hover {
+  background-position:  94px 0;
+}
+.tweet-block.custom_thin .intents ul li a {
   display: block;
-  margin: 7px 0 4px 0;
-  position: relative;
-}
-.block-tweet_block .twitter-footer p {
-  font-size: 10px;
-  font-weight: bold;
-  padding: 5px 0;
-  text-align: right;
-  text-transform: uppercase;
-}
-.block-tweet_block .twitter-footer img.arrow {
-  padding: 3px 0 0 4px;
+  height: 18px;
+  overflow: hidden;
+  text-indent: -1000em;
+  width: 12px;
 }

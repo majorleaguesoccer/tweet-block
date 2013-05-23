@@ -1,0 +1,1 @@
+<a class="twitter-timeline" href="https://twitter.com/<?php print $content['username']; ?>" data-widget-id="244168824016998400">Tweets by <?php print $content['username']; ?></a>

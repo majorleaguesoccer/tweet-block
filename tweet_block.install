@@ -4,9 +4,7 @@
  * Tweet block install
  */
 /**
- * Implementation of hook_schema().
- *
- * TODO: Describe the module's data model
+ * Implements of hook_schema().
  *
  */
 function tweet_block_schema() {
@@ -22,7 +20,8 @@ function tweet_block_schema() {
       ),
       'tweet_id' => array(
         'description' => t('Id of the tweet'),
-        'type' => 'int',
+        'type' => 'varchar',
+        'length' => '100',
         'not null' => FALSE,
       ),
       'tweet_markup' => array(
@@ -50,7 +49,7 @@ function tweet_block_schema() {
     'primary key' => array('tweet_block_uid'),
   );
   
-  //used for specific feed style blocks
+  // Embedable timelines
   $schema['tweet_feed_block'] = array(
     'description' => t('Table to house twitter feed blocks.'),
     'fields' => array(
@@ -108,18 +107,4 @@ function tweet_block_install() {
 function tweet_block_uninstall() {
   // perform uninstall stuffz
   drupal_uninstall_schema('tweet_block');
-}
-
-/** 
- * Update to change db type on tweetid. Tweet ids are freaking long and going to get longer, int can't handle it.
- * @author Hans 'Table Alterer' Gutknecht
- */
-function tweet_block_update_8010() {
- $ret = array();
-
- db_change_field($ret, 'tweet_block', 'tweet_id', 'tweet_id',
-   array('type' => 'varchar', 'length' => '40')
-   );
-
- return $ret;
 }

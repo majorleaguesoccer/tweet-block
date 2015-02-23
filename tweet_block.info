@@ -1,6 +1,3 @@
 name = Tweet Block
-description = "Generate static blocks of specified tweets."
-core = 6.x
-package = MLS
-
-; dependencies[] = module_dependent
+description = "Generate static blocks of specified tweets and use embeddeed timelines"
+core = 7.x
